@@ -28,15 +28,32 @@ function updateDisplay() {
 
 function playChime() {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type = 'sine';
-    o.frequency.value = 880;
-    g.gain.value = 0.1;
-    o.connect(g).connect(ctx.destination);
-    o.start();
-    o.stop(ctx.currentTime + 0.4);
-    o.onended = () => ctx.close();
+    // First oscillator (main bell tone)
+    const o1 = ctx.createOscillator();
+    const g1 = ctx.createGain();
+    o1.type = 'triangle';
+    o1.frequency.value = 1047; // C6, bell-like
+    g1.gain.value = 0.0;
+    o1.connect(g1).connect(ctx.destination);
+    o1.start();
+    g1.gain.linearRampToValueAtTime(0.25, ctx.currentTime + 0.01); // soft attack
+    g1.gain.linearRampToValueAtTime(0.0, ctx.currentTime + 0.6); // gentle decay
+    o1.stop(ctx.currentTime + 0.6);
+
+    // Second oscillator (higher overtone, for notification feel)
+    const o2 = ctx.createOscillator();
+    const g2 = ctx.createGain();
+    o2.type = 'triangle';
+    o2.frequency.value = 1568; // G6, a fifth above
+    g2.gain.value = 0.0;
+    o2.connect(g2).connect(ctx.destination);
+    o2.start(ctx.currentTime + 0.08); // comes in slightly after
+    g2.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 0.10);
+    g2.gain.linearRampToValueAtTime(0.0, ctx.currentTime + 0.5);
+    o2.stop(ctx.currentTime + 0.5);
+
+    // Clean up
+    o1.onended = () => ctx.close();
 }
 
 function updateModeLabel() {
