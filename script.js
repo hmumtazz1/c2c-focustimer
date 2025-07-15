@@ -6,8 +6,10 @@ const modeLabel = document.getElementById('modeLabel');
 const settingsBtn = document.getElementById('settingsBtn');
 const settingsModal = document.getElementById('settingsModal');
 const settingsForm = document.getElementById('settingsForm');
-const workDurationInput = document.getElementById('workDurationInput');
-const restDurationInput = document.getElementById('restDurationInput');
+const workDurationMinutesInput = document.getElementById('workDurationMinutesInput');
+const workDurationSecondsInput = document.getElementById('workDurationSecondsInput');
+const restDurationMinutesInput = document.getElementById('restDurationMinutesInput');
+const restDurationSecondsInput = document.getElementById('restDurationSecondsInput');
 const saveSettingsBtn = document.getElementById('saveSettingsBtn');
 const cancelSettingsBtn = document.getElementById('cancelSettingsBtn');
 
@@ -42,8 +44,10 @@ function updateModeLabel() {
 }
 
 function openSettingsModal() {
-    workDurationInput.value = Math.floor(workDuration / 60);
-    restDurationInput.value = Math.floor(restDuration / 60);
+    workDurationMinutesInput.value = Math.floor(workDuration / 60);
+    workDurationSecondsInput.value = workDuration % 60;
+    restDurationMinutesInput.value = Math.floor(restDuration / 60);
+    restDurationSecondsInput.value = restDuration % 60;
     settingsModal.classList.add('show');
 }
 
@@ -112,11 +116,15 @@ cancelSettingsBtn.addEventListener('click', (e) => {
 });
 settingsForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const newWork = parseInt(workDurationInput.value);
-    const newRest = parseInt(restDurationInput.value);
+    const newWorkMin = parseInt(workDurationMinutesInput.value) || 0;
+    const newWorkSec = parseInt(workDurationSecondsInput.value) || 0;
+    const newRestMin = parseInt(restDurationMinutesInput.value) || 0;
+    const newRestSec = parseInt(restDurationSecondsInput.value) || 0;
+    const newWork = newWorkMin * 60 + newWorkSec;
+    const newRest = newRestMin * 60 + newRestSec;
     if (newWork > 0 && newRest > 0) {
-        workDuration = newWork * 60;
-        restDuration = newRest * 60;
+        workDuration = newWork;
+        restDuration = newRest;
         if (isWorkMode) {
             timeLeft = workDuration;
         } else {
